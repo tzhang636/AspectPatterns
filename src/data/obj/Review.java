@@ -1,4 +1,4 @@
-package data;
+package data.obj;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import nlp.NLP;
+import nlp.io.NLP;
+import nlp.io.StopWords;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.StopFilter;
@@ -53,6 +54,9 @@ public final class Review {
   /* nouns with stop words removed, then stemmed */
   private List<List<String>> stopStemNouns = null;
 
+  /* lowercased nouns */
+  private List<List<String>> lNouns = null;
+
   public Review(final Ratings ratings, final String location, final String title,
       final String author, final String reviewId, final String content, final String date) {
     this.ratings = ratings;
@@ -80,7 +84,7 @@ public final class Review {
    * 
    * @return
    */
-  public final List<List<String>> getNouns() {
+  public final List<List<String>> extractNouns() {
     if (nouns == null) {
       nouns = new ArrayList<>();
 
@@ -109,12 +113,12 @@ public final class Review {
           sentNouns.add(nounPhrase);
         }
 
+        // add if there is at least one noun in sentence
         if (!sentNouns.isEmpty()) {
           nouns.add(sentNouns);
         }
       }
     }
-
     // nouns should not be modifiable from the outside
     return Collections.unmodifiableList(nouns);
   }
@@ -126,11 +130,10 @@ public final class Review {
    * @return
    * @throws IOException
    */
-  public final List<List<String>> getStopStemNouns() throws IOException {
+  public final List<List<String>> stopStemNouns() throws IOException {
     if (nouns == null) {
-      getNouns();
+      extractNouns();
     }
-
     if (stopStemNouns == null) {
       stopStemNouns = new ArrayList<>();
 
@@ -139,37 +142,55 @@ public final class Review {
 
         for (String noun : sentNouns) {
           TokenStream tokenStream = new StandardTokenizer(new StringReader(noun));
-          tokenStream = new StopFilter(tokenStream, NLP.getStopWords());
+          tokenStream = new StopFilter(tokenStream, StopWords.getStopWords());
           tokenStream = new PorterStemFilter(tokenStream);
           CharTermAttribute term = tokenStream.addAttribute(CharTermAttribute.class);
-
           // initialize stream
           tokenStream.reset();
-
           // reassembles noun with stop words removed
           StringBuilder sb = new StringBuilder();
           while (tokenStream.incrementToken()) {
             sb.append(term.toString()).append(" ");
           }
-
           // add if noun is not empty
           if (sb.length() > 1) { // 1 because of last space
             sb.deleteCharAt(sb.length() - 1); // remove last space
             sentStopStemNouns.add(sb.toString());
           }
-
           // teardown stream
           tokenStream.end();
           tokenStream.close();
         }
-
+        // add if not empty
         if (!sentStopStemNouns.isEmpty()) {
           stopStemNouns.add(sentStopStemNouns);
         }
       }
     }
-
     return Collections.unmodifiableList(stopStemNouns);
+  }
+
+  /**
+   * Lowercase all nouns and noun phrases.
+   * 
+   * @return
+   * @throws IOException
+   */
+  public final List<List<String>> lowercaseNouns() throws IOException {
+    if (stopStemNouns == null) {
+      stopStemNouns();
+    }
+    if (lNouns == null) {
+      lNouns = new ArrayList<List<String>>();
+      for (List<String> sentNouns : stopStemNouns) {
+        List<String> lSentNouns = new ArrayList<String>();
+        for (String noun : sentNouns) {
+          lSentNouns.add(noun.toLowerCase());
+        }
+        lNouns.add(lSentNouns);
+      }
+    }
+    return Collections.unmodifiableList(lNouns);
   }
 
   @Override

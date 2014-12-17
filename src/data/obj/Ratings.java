@@ -1,4 +1,4 @@
-package data;
+package data.obj;
 
 public final class Ratings {
 

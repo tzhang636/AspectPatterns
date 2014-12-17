@@ -1,13 +1,12 @@
-package nlp;
-
-import io.load.Json;
+package main;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
-import data.Hotel;
-import data.Review;
+import data.load.Json;
+import data.obj.Hotel;
+import data.obj.Review;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 
 public final class Processor {
@@ -30,8 +29,8 @@ public final class Processor {
     for (int i = 0; i < numReviews; ++i) {
       final Review review = hotel.getReview(i);
       review.annotate(pipeline);
-      List<List<String>> nouns = review.getNouns();
-      List<List<String>> stopStemNouns = review.getStopStemNouns();
+      List<List<String>> nouns = review.lowercaseNouns();
+      System.out.println(nouns);
 
     }
   }

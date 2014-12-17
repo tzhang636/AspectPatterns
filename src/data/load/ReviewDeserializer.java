@@ -1,4 +1,4 @@
-package io.load;
+package data.load;
 
 import java.lang.reflect.Type;
 
@@ -8,8 +8,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
-import data.Ratings;
-import data.Review;
+import data.obj.Ratings;
+import data.obj.Review;
 
 final class ReviewDeserializer implements JsonDeserializer<Review> {
 

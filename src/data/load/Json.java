@@ -1,4 +1,4 @@
-package io.load;
+package data.load;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,9 +8,9 @@ import java.io.Reader;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import data.Hotel;
-import data.Ratings;
-import data.Review;
+import data.obj.Hotel;
+import data.obj.Ratings;
+import data.obj.Review;
 
 public final class Json {
 
