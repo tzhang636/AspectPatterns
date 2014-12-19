@@ -14,6 +14,7 @@ public final class StopWords {
 
   private StopWords() {}
 
+  /* absolute path, from src folder */
   private static final String STOP_WORDS_PATH = "/nlp/res/StopWords.txt";
 
   private static CharArraySet stopWords = null;
@@ -24,18 +25,14 @@ public final class StopWords {
       final InputStream is = NLP.class.getResourceAsStream(STOP_WORDS_PATH);
       final Reader reader = new InputStreamReader(is, "UTF-8");
       final BufferedReader br = new BufferedReader(reader);
-      try {
-        String line = br.readLine();
-        while (line != null) {
-          stopWords.add(line);
-          line = br.readLine();
-        }
-      } finally {
-        br.close();
+      String line = br.readLine();
+      while (line != null) {
+        stopWords.add(line);
+        line = br.readLine();
       }
+      br.close();
       StopWords.stopWords = new CharArraySet(stopWords, true);
     }
     return stopWords;
   }
-
 }

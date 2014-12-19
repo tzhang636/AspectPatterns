@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
+import nlp.io.SPMF;
 import data.load.Json;
 import data.obj.Hotel;
 import data.obj.Review;
@@ -11,10 +12,11 @@ import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 
 public final class Processor {
 
+  /* Stanford NLP tools */
   private static final Properties props;
   private static final StanfordCoreNLP pipeline;
 
-  // initialize the NLP pipeline
+  // initialize the Stanford NLP pipeline
   static {
     props = new Properties();
     props.put("annotators", "tokenize, ssplit, pos, parse");
@@ -30,8 +32,8 @@ public final class Processor {
       final Review review = hotel.getReview(i);
       review.annotate(pipeline);
       List<List<String>> nouns = review.lowercaseNouns();
-      System.out.println(nouns);
-
+      SPMF.write(nouns);
+      SPMF.run();
     }
   }
 
