@@ -45,9 +45,6 @@ public final class Review {
   /* string representation of this review */
   private String string = null;
 
-  /* annotation associated with this review */
-  private Annotation annotation = null;
-
   /* nouns and noun phrases associated with this review */
   private List<List<String>> nouns = null;
 
@@ -68,15 +65,8 @@ public final class Review {
     this.date = date;
   }
 
-  public final String getContent() {
-    return content;
-  }
-
-  public final void annotate(final StanfordCoreNLP pipeline) {
-    if (annotation == null) {
-      annotation = new Annotation(content);
-      pipeline.annotate(annotation);
-    }
+  public final List<List<String>> getLowercaseNouns() {
+    return lNouns;
   }
 
   /**
@@ -84,8 +74,12 @@ public final class Review {
    * 
    * @return
    */
-  public final List<List<String>> extractNouns() {
+  public final List<List<String>> extractNouns(final StanfordCoreNLP pipeline) {
     if (nouns == null) {
+      // create annotation
+      final Annotation annotation = new Annotation(content);
+      pipeline.annotate(annotation);
+
       nouns = new ArrayList<>();
 
       List<CoreMap> sents = annotation.get(SentencesAnnotation.class);
@@ -130,9 +124,9 @@ public final class Review {
    * @return
    * @throws IOException
    */
-  public final List<List<String>> stopStemNouns() throws IOException {
+  public final List<List<String>> stopStemNouns(final StanfordCoreNLP pipeline) throws IOException {
     if (nouns == null) {
-      extractNouns();
+      extractNouns(pipeline);
     }
     if (stopStemNouns == null) {
       stopStemNouns = new ArrayList<>();
@@ -176,9 +170,9 @@ public final class Review {
    * @return
    * @throws IOException
    */
-  public final List<List<String>> lowercaseNouns() throws IOException {
+  public final List<List<String>> lowercaseNouns(final StanfordCoreNLP pipeline) throws IOException {
     if (stopStemNouns == null) {
-      stopStemNouns();
+      stopStemNouns(pipeline);
     }
     if (lNouns == null) {
       lNouns = new ArrayList<List<String>>();
